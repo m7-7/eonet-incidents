@@ -133,27 +133,11 @@ watchEffect(() => {
                     name="OpenStreetMap" />
 
                 <LPolyline v-for="line in lineFeatures" :key="`${line.incidentId}-${line.date}-line`"
-                    :lat-lngs="line.latLngs" :weight="line.isSelected ? 6 : 4" @click="handleSelect(line.incidentId)">
-                    <LPopup>
-                        <div class="text-sm">
-                            <p class="font-semibold">{{ line.title }}</p>
-                            <p>Category: {{ line.category }}</p>
-                            <p>Date: {{ formatDate(line.date) }}</p>
-                        </div>
-                    </LPopup>
-                </LPolyline>
+                    :lat-lngs="line.latLngs" :weight="line.isSelected ? 6 : 4" @click="handleSelect(line.incidentId)" />
 
                 <LCircleMarker v-for="point in pointFeatures"
                     :key="`${point.incidentId}-${point.date}-${point.latLng.join(',')}`" :lat-lng="point.latLng"
-                    :radius="point.isSelected ? 9 : 6" @click="handleSelect(point.incidentId)">
-                    <LPopup>
-                        <div class="text-sm">
-                            <p class="font-semibold">{{ point.title }}</p>
-                            <p>Category: {{ point.category }}</p>
-                            <p>Date: {{ formatDate(point.date) }}</p>
-                        </div>
-                    </LPopup>
-                </LCircleMarker>
+                    :radius="point.isSelected ? 9 : 6" @click="handleSelect(point.incidentId)" />
             </LMap>
         </div>
     </ClientOnly>
