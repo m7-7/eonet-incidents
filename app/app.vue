@@ -8,6 +8,7 @@ import ExplorerToolbar from '~/components/explorer/ExplorerToolbar.vue'
 import IncidentDetailModal from '~/components/incidents/IncidentDetailModal.vue'
 import { useIncidentAnalytics } from '~/composables/useIncidentAnalytics'
 import AnalyticsPanel from '~/components/analytics/AnalyticsPanel.vue'
+import AnalyticsModal from '~/components/analytics/AnalyticsModal.vue'
 
 const {
   incidents,
@@ -75,6 +76,16 @@ async function handleSwitchToLiveData() {
   resetAnalytics()
   await switchToLiveData()
 }
+
+const isAnalyticsModalOpen = ref(false)
+
+function openAnalyticsModal() {
+  isAnalyticsModalOpen.value = true
+}
+
+function closeAnalyticsModal() {
+  isAnalyticsModalOpen.value = false
+}
 </script>
 
 <template>
@@ -92,7 +103,8 @@ async function handleSwitchToLiveData() {
 
       <ExplorerToolbar :current-view="currentView" :selected-category="selectedCategory" :sort-order="sortOrder"
         :category-options="categoryOptions" :total="sortedIncidents.length" @update-view="currentView = $event"
-        @update-category="selectedCategory = $event" @update-sort="sortOrder = $event" />
+        @update-category="selectedCategory = $event" @update-sort="sortOrder = $event"
+        @open-analytics="openAnalyticsModal" />
 
       <section v-if="isLoading" class="rounded-lg border bg-white p-6 shadow-sm">
         <p class="text-sm text-slate-600">Loading incidents...</p>
@@ -128,8 +140,8 @@ async function handleSwitchToLiveData() {
           @select="handleIncidentSelect" />
       </section>
 
-      <AnalyticsPanel v-if="incidents.length" :items="topClickedIncidents" @reset="resetAnalytics" />
-
+      <AnalyticsModal :is-open="isAnalyticsModalOpen" :items="topClickedIncidents" @close="closeAnalyticsModal"
+        @reset="resetAnalytics" />
       <IncidentDetailModal :incident="selectedIncident" @close="clearSelectedIncident" />
     </div>
   </main>

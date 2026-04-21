@@ -36,7 +36,7 @@ onMounted(() => {
 
 <template>
     <Teleport to="body">
-        <div v-if="isOpen" class="fixed inset-0 z-[1000] flex items-center justify-center bg-black/50 p-4"
+        <div v-if="isOpen" class="fixed inset-0 z-[5000] flex items-center justify-center bg-black/50 p-4"
             @click="onBackdropClick">
             <div class="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white shadow-xl" role="dialog"
                 aria-modal="true" aria-labelledby="analytics-modal-title">

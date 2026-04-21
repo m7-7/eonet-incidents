@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const props = defineProps<{
+defineProps<{
     currentView: 'list' | 'map'
     selectedCategory: string
     sortOrder: 'recent' | 'oldest'
@@ -11,6 +11,7 @@ const emit = defineEmits<{
     updateView: [value: 'list' | 'map']
     updateCategory: [value: string]
     updateSort: [value: 'recent' | 'oldest']
+    openAnalytics: []
 }>()
 
 const isMobilePanelOpen = ref(false)
@@ -37,7 +38,6 @@ function closeMobilePanel() {
 
 <template>
     <section class="mb-6 rounded-lg border bg-white p-4 shadow-sm">
-        <!-- Mobile -->
         <div class="md:hidden">
             <div class="flex items-center justify-between gap-3">
                 <button type="button"
@@ -46,9 +46,16 @@ function closeMobilePanel() {
                     {{ isMobilePanelOpen ? 'Close filters' : 'Filters & sort' }}
                 </button>
 
-                <p class="text-sm text-slate-600">
-                    {{ total }} incidents
-                </p>
+                <div class="flex items-center gap-2">
+                    <button type="button" class="rounded-md border border-slate-300 px-3 py-2 text-sm"
+                        @click="$emit('openAnalytics')">
+                        Analytics
+                    </button>
+
+                    <p class="text-sm text-slate-600">
+                        {{ total }}
+                    </p>
+                </div>
             </div>
 
             <div v-if="isMobilePanelOpen" class="mt-4 space-y-4 rounded-lg border border-slate-200 bg-slate-50 p-4">
@@ -96,7 +103,6 @@ function closeMobilePanel() {
             </div>
         </div>
 
-        <!-- Desktop / Tablet -->
         <div class="hidden md:block">
             <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
                 <div class="flex flex-col gap-4 md:flex-row">
@@ -137,9 +143,16 @@ function closeMobilePanel() {
                     </div>
                 </div>
 
-                <p class="text-sm text-slate-600">
-                    Showing {{ total }} incidents
-                </p>
+                <div class="flex items-center gap-4">
+                    <button type="button" class="rounded-md border border-slate-300 px-4 py-2 text-sm"
+                        @click="$emit('openAnalytics')">
+                        Analytics
+                    </button>
+
+                    <p class="text-sm text-slate-600">
+                        Showing {{ total }} incidents
+                    </p>
+                </div>
             </div>
         </div>
     </section>

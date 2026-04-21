@@ -121,14 +121,6 @@ export function useEonetEvents() {
 
       const json = await response.json();
 
-      console.log("RAW RESPONSE:", json);
-      console.log("RESPONSE OK:", response.ok);
-      console.log("HAS EVENTS ARRAY:", Array.isArray(json?.events));
-      console.log(
-        "EVENTS LENGTH:",
-        Array.isArray(json?.events) ? json.events.length : "no events",
-      );
-
       hasLoadedLive.value = true;
 
       if (!response.ok) {
@@ -183,15 +175,6 @@ export function useEonetEvents() {
     isUsingMock.value = false;
     await fetchLiveData();
   }
-
-  watchEffect(() => {
-    console.log("LIVE RESPONSE REF:", liveResponse.value);
-    console.log("LIVE INCIDENTS:", liveIncidents.value.length);
-    console.log("INCIDENTS:", incidents.value.length);
-    console.log("IS ERROR:", isError.value);
-    console.log("IS EMPTY:", isEmpty.value);
-    console.log("IS USING MOCK:", isUsingMock.value);
-  });
 
   onMounted(async () => {
     await fetchLiveData();
