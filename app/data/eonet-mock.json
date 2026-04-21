@@ -1,0 +1,162 @@
+{
+	"title": "EONET Events",
+	"description": "Natural events from EONET.",
+	"link": "https://eonet.gsfc.nasa.gov/api/v3/events",
+	"events": [
+		{
+			"id": "EONET_19792",
+			"title": "Crews Rd (10) Wildfire, Clay, Florida",
+			"description": "23 Miles NE from Green Cove Springs, FL",
+			"link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_19792",
+			"closed": null,
+			"categories": [
+				{
+					"id": "wildfires",
+					"title": "Wildfires"
+				}
+			],
+			"sources": [
+				{
+					"id": "IRWIN",
+					"url": "https://irwin.doi.gov/observer/incidents/f8e1919c-1492-4a3b-afb8-e14cbf8c95f6"
+				}
+			],
+			"geometry": [
+				{
+					"magnitudeValue": 1700,
+					"magnitudeUnit": "acres",
+					"date": "2026-04-20T10:45:00Z",
+					"type": "Point",
+					"coordinates": [
+						-81.6333333,
+						29.8861111
+					]
+				}
+			]
+		},
+		{
+			"id": "EONET_19797",
+			"title": "RAILROAD COMPLEX Wildfire, Putnam, Florida",
+			"description": "10 Miles NE from PALATKA, FL",
+			"link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_19797",
+			"closed": null,
+			"categories": [
+				{
+					"id": "wildfires",
+					"title": "Wildfires"
+				}
+			],
+			"sources": [
+				{
+					"id": "IRWIN",
+					"url": "https://irwin.doi.gov/observer/incidents/796628ce-7fec-43ff-bc4d-b39b42a388e8"
+				}
+			],
+			"geometry": [
+				{
+					"magnitudeValue": 700,
+					"magnitudeUnit": "acres",
+					"date": "2026-04-19T21:13:00Z",
+					"type": "Point",
+					"coordinates": [
+						-81.6330556,
+						29.7855556
+					]
+				}
+			]
+		},
+		{
+			"id": "EONET_19799",
+			"title": "RAILROAD COMPLEX Wildfire, Putnam, Florida",
+			"description": "10 Miles N from Palatka, FL",
+			"link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_19799",
+			"closed": null,
+			"categories": [
+				{
+					"id": "wildfires",
+					"title": "Wildfires"
+				}
+			],
+			"sources": [
+				{
+					"id": "IRWIN",
+					"url": "https://irwin.doi.gov/observer/incidents/da3d02b0-fefa-4f84-9be7-dc52f5928140"
+				}
+			],
+			"geometry": [
+				{
+					"magnitudeValue": 700,
+					"magnitudeUnit": "acres",
+					"date": "2026-04-19T19:36:00Z",
+					"type": "Point",
+					"coordinates": [
+						-81.6327778,
+						29.7855556
+					]
+				}
+			]
+		},
+		{
+			"id": "EONET_19794",
+			"title": "TUMEY Wildfire, Fresno, California",
+			"description": null,
+			"link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_19794",
+			"closed": "2026-04-19T00:00:00Z",
+			"categories": [
+				{
+					"id": "wildfires",
+					"title": "Wildfires"
+				}
+			],
+			"sources": [
+				{
+					"id": "IRWIN",
+					"url": "https://irwin.doi.gov/observer/incidents/fa80604e-ca8e-4f79-bdde-f0bf4cda4d64"
+				}
+			],
+			"geometry": [
+				{
+					"magnitudeValue": 1200,
+					"magnitudeUnit": "acres",
+					"date": "2026-04-19T15:52:00Z",
+					"type": "Point",
+					"coordinates": [
+						-120.65767,
+						36.622459
+					]
+				}
+			]
+		},
+		{
+			"id": "EONET_19793",
+			"title": "Pineland Rd Wildfire, Clinch, Georgia",
+			"description": "13 Miles NW from Fargo, GA",
+			"link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_19793",
+			"closed": null,
+			"categories": [
+				{
+					"id": "wildfires",
+					"title": "Wildfires"
+				}
+			],
+			"sources": [
+				{
+					"id": "IRWIN",
+					"url": "https://irwin.doi.gov/observer/incidents/c62c2af2-b5f3-4666-9516-6b9b1305c9f1"
+				}
+			],
+			"geometry": [
+				{
+					"magnitudeValue": 4000,
+					"magnitudeUnit": "acres",
+					"date": "2026-04-19T10:47:00Z",
+					"type": "Point",
+					"coordinates": [
+						-82.7680556,
+						30.7563889
+					]
+				}
+			]
+		}
+	]
+}

@@ -1,0 +1,1 @@
+The app uses the public NASA EONET API. During development and testing, the API occasionally returned temporary high-demand responses, so the UI includes defensive loading and error handling. A local mock dataset can also be used to continue development when the upstream service is unavailable.
