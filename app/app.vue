@@ -2,6 +2,7 @@
 import { useEonetEvents } from '~/composables/useEonetEvents'
 import { useIncidentExplorer } from '~/composables/useIncidentExplorer'
 import IncidentMap from '~/components/incidents/IncidentMap.vue'
+import DataSourceBanner from '~/components/explorer/DataSourceBanner.vue'
 
 const {
   incidents,
@@ -69,40 +70,8 @@ function formatCoordinates(coordinates: number[] | number[][] | undefined) {
         </p>
       </header>
 
-      <section
-        v-if="isUsingMock"
-        class="mb-6 rounded-lg border border-amber-300 bg-amber-50 p-4 shadow-sm"
-      >
-        <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div>
-            <p class="text-sm font-semibold text-amber-900">
-              Viewing demo data
-            </p>
-            <p class="mt-1 text-sm text-amber-800">
-              Live NASA data was unavailable, so the app is currently showing demo incidents.
-            </p>
-          </div>
-
-          <div class="flex flex-wrap gap-3">
-            <button
-              type="button"
-              class="rounded-md border border-amber-400 px-4 py-2 text-sm text-amber-900"
-              @click="checkLiveAvailability"
-            >
-              Check live data
-            </button>
-
-            <button
-              v-if="liveAvailable"
-              type="button"
-              class="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white"
-              @click="switchToLiveData"
-            >
-              Switch to live data
-            </button>
-          </div>
-        </div>
-      </section>
+      <DataSourceBanner :is-using-mock="isUsingMock" :live-available="liveAvailable" @check-live="checkLiveAvailability"
+        @switch-live="switchToLiveData" />
 
       <section class="mb-6 rounded-lg border bg-white p-4 shadow-sm">
         <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
@@ -111,11 +80,8 @@ function formatCoordinates(coordinates: number[] | number[][] | undefined) {
               <label for="view" class="mb-1 block text-sm font-medium text-slate-700">
                 View
               </label>
-              <select
-                id="view"
-                v-model="currentView"
-                class="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
-              >
+              <select id="view" v-model="currentView"
+                class="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm">
                 <option value="list">List</option>
                 <option value="map">Map</option>
               </select>
@@ -125,16 +91,9 @@ function formatCoordinates(coordinates: number[] | number[][] | undefined) {
               <label for="category" class="mb-1 block text-sm font-medium text-slate-700">
                 Category
               </label>
-              <select
-                id="category"
-                v-model="selectedCategory"
-                class="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
-              >
-                <option
-                  v-for="category in categoryOptions"
-                  :key="category"
-                  :value="category"
-                >
+              <select id="category" v-model="selectedCategory"
+                class="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm">
+                <option v-for="category in categoryOptions" :key="category" :value="category">
                   {{ category }}
                 </option>
               </select>
@@ -144,11 +103,8 @@ function formatCoordinates(coordinates: number[] | number[][] | undefined) {
               <label for="sort" class="mb-1 block text-sm font-medium text-slate-700">
                 Sort
               </label>
-              <select
-                id="sort"
-                v-model="sortOrder"
-                class="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
-              >
+              <select id="sort" v-model="sortOrder"
+                class="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm">
                 <option value="recent">Most recent</option>
                 <option value="oldest">Oldest</option>
               </select>
@@ -173,19 +129,12 @@ function formatCoordinates(coordinates: number[] | number[][] | undefined) {
         </p>
 
         <div class="mt-4 flex flex-wrap gap-3">
-          <button
-            type="button"
-            class="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white"
-            @click="retryLiveData"
-          >
+          <button type="button" class="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white"
+            @click="retryLiveData">
             Retry
           </button>
 
-          <button
-            type="button"
-            class="rounded-md border border-slate-300 px-4 py-2 text-sm"
-            @click="useMockData"
-          >
+          <button type="button" class="rounded-md border border-slate-300 px-4 py-2 text-sm" @click="useMockData">
             Use demo data
           </button>
         </div>
@@ -195,20 +144,11 @@ function formatCoordinates(coordinates: number[] | number[][] | undefined) {
         <p class="text-sm text-slate-600">No incidents found.</p>
       </section>
 
-      <section
-        v-else-if="currentView === 'list'"
-        class="rounded-lg border bg-white shadow-sm"
-      >
+      <section v-else-if="currentView === 'list'" class="rounded-lg border bg-white shadow-sm">
         <ul class="divide-y">
-          <li
-            v-for="incident in sortedIncidents"
-            :key="incident.id"
-          >
-            <button
-              type="button"
-              class="w-full p-4 text-left transition hover:bg-slate-50"
-              @click="selectIncident(incident.id)"
-            >
+          <li v-for="incident in sortedIncidents" :key="incident.id">
+            <button type="button" class="w-full p-4 text-left transition hover:bg-slate-50"
+              @click="selectIncident(incident.id)">
               <h2 class="text-base font-semibold">
                 {{ incident.title }}
               </h2>
@@ -231,21 +171,11 @@ function formatCoordinates(coordinates: number[] | number[][] | undefined) {
         </ul>
       </section>
 
-      <section
-        v-else
-        class="rounded-lg border bg-white p-4 shadow-sm"
-      >
-        <IncidentMap
-          :incidents="sortedIncidents"
-          :selected-incident-id="selectedIncidentId"
-          @select="selectIncident"
-        />
+      <section v-else class="rounded-lg border bg-white p-4 shadow-sm">
+        <IncidentMap :incidents="sortedIncidents" :selected-incident-id="selectedIncidentId" @select="selectIncident" />
       </section>
 
-      <section
-        v-if="selectedIncident"
-        class="mt-6 rounded-lg border bg-white p-6 shadow-sm"
-      >
+      <section v-if="selectedIncident" class="mt-6 rounded-lg border bg-white p-6 shadow-sm">
         <div class="flex items-start justify-between gap-4">
           <div>
             <h2 class="text-xl font-bold">{{ selectedIncident.title }}</h2>
@@ -255,11 +185,8 @@ function formatCoordinates(coordinates: number[] | number[][] | undefined) {
             </p>
           </div>
 
-          <button
-            type="button"
-            class="rounded-md border border-slate-300 px-3 py-2 text-sm"
-            @click="clearSelectedIncident"
-          >
+          <button type="button" class="rounded-md border border-slate-300 px-3 py-2 text-sm"
+            @click="clearSelectedIncident">
             Close
           </button>
         </div>
@@ -270,11 +197,8 @@ function formatCoordinates(coordinates: number[] | number[][] | undefined) {
           </h3>
 
           <ul class="mt-3 space-y-3">
-            <li
-              v-for="(item, index) in selectedIncident.geometry"
-              :key="`${selectedIncident.id}-${index}`"
-              class="rounded-md border border-slate-200 p-3"
-            >
+            <li v-for="(item, index) in selectedIncident.geometry" :key="`${selectedIncident.id}-${index}`"
+              class="rounded-md border border-slate-200 p-3">
               <p class="text-sm text-slate-700">
                 <span class="font-medium">Type:</span>
                 {{ item.type || 'Unknown' }}
@@ -298,37 +222,20 @@ function formatCoordinates(coordinates: number[] | number[][] | undefined) {
             Sources
           </h3>
 
-          <ul
-            v-if="selectedIncident.sources.length"
-            class="mt-3 space-y-2"
-          >
-            <li
-              v-for="(source, index) in selectedIncident.sources"
-              :key="`${selectedIncident.id}-source-${index}`"
-            >
-              <a
-                v-if="source.url"
-                :href="source.url"
-                target="_blank"
-                rel="noreferrer"
-                class="text-sm font-medium text-blue-600 underline"
-              >
+          <ul v-if="selectedIncident.sources.length" class="mt-3 space-y-2">
+            <li v-for="(source, index) in selectedIncident.sources" :key="`${selectedIncident.id}-source-${index}`">
+              <a v-if="source.url" :href="source.url" target="_blank" rel="noreferrer"
+                class="text-sm font-medium text-blue-600 underline">
                 {{ source.id || source.url }}
               </a>
 
-              <span
-                v-else
-                class="text-sm text-slate-600"
-              >
+              <span v-else class="text-sm text-slate-600">
                 {{ source.id || 'Unknown source' }}
               </span>
             </li>
           </ul>
 
-          <p
-            v-else
-            class="mt-3 text-sm text-slate-600"
-          >
+          <p v-else class="mt-3 text-sm text-slate-600">
             No source links available.
           </p>
         </div>
