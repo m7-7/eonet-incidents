@@ -98,6 +98,7 @@ NASA EONET API (v3): https://eonet.gsfc.nasa.gov/api/v3/events
 ## 🔮 Possible Improvements
 
 - 🔍 Add search functionality
+- 🌙 Add dark mode (night view)
 - 📄 Pagination or virtualized list
 - 📌 Enhanced map highlighting/animation
 - 🌐 Backend-powered analytics
