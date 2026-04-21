@@ -74,6 +74,43 @@ const pointFeatures = computed(() => {
     return features
 })
 
+const multiPointLines = computed(() => {
+    const features: Array<{
+        incidentId: string
+        title: string
+        category: string
+        latLngs: [number, number][]
+        isSelected: boolean
+    }> = []
+
+    for (const incident of props.incidents) {
+        const pointGeometries = incident.geometry
+            .filter(
+                (geometry) =>
+                    geometry.type === 'Point' && isPointCoordinates(geometry.coordinates),
+            )
+            .sort((a, b) => {
+                const aTime = a.date ? new Date(a.date).getTime() : 0
+                const bTime = b.date ? new Date(b.date).getTime() : 0
+                return aTime - bTime
+            })
+
+        if (pointGeometries.length > 1) {
+            features.push({
+                incidentId: incident.id,
+                title: incident.title,
+                category: incident.categories[0] || 'Unknown',
+                latLngs: pointGeometries.map((geometry) =>
+                    toLatLngPoint(geometry.coordinates as [number, number]),
+                ),
+                isSelected: props.selectedIncidentId === incident.id,
+            })
+        }
+    }
+
+    return features
+})
+
 const lineFeatures = computed(() => {
     const features: Array<{
         incidentId: string
@@ -127,11 +164,18 @@ function handleSelect(incidentId: string) {
                     name="OpenStreetMap" />
 
                 <LPolyline v-for="line in lineFeatures" :key="`${line.incidentId}-${line.date}-line`"
-                    :lat-lngs="line.latLngs" :weight="line.isSelected ? 6 : 4" @click="handleSelect(line.incidentId)" />
+                    :lat-lngs="line.latLngs" :color="line.isSelected ? '#16a34a' : '#2563eb'"
+                    :weight="line.isSelected ? 6 : 3" @click="handleSelect(line.incidentId)" />
+
+                <LPolyline v-for="line in multiPointLines" :key="`${line.incidentId}-multi-point-line`"
+                    :lat-lngs="line.latLngs" :color="line.isSelected ? '#16a34a' : '#2563eb'"
+                    :weight="line.isSelected ? 5 : 2.5" :opacity="0.7" @click="handleSelect(line.incidentId)" />
 
                 <LCircleMarker v-for="point in pointFeatures"
                     :key="`${point.incidentId}-${point.date}-${point.latLng.join(',')}`" :lat-lng="point.latLng"
-                    :radius="point.isSelected ? 9 : 6" @click="handleSelect(point.incidentId)" />
+                    :radius="point.isSelected ? 10 : 6" :color="point.isSelected ? '#16a34a' : '#2563eb'"
+                    :fillColor="point.isSelected ? '#16a34a' : '#3b82f6'" :fillOpacity="0.6"
+                    :weight="point.isSelected ? 3 : 1.5" @click="handleSelect(point.incidentId)" />
             </LMap>
         </div>
     </ClientOnly>

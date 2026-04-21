@@ -116,7 +116,7 @@ export function useEonetEvents() {
 
     try {
       const response = await fetch(
-        "https://eonet.gsfc.nasa.gov/api/v3/events?limit=100&status=all",
+        "https://eonet.gsfc.nasa.gov/api/v3/events?limit=250&status=all",
       );
 
       const json = await response.json();
