@@ -6,6 +6,8 @@ import IncidentList from '~/components/incidents/IncidentList.vue'
 import DataSourceBanner from '~/components/explorer/DataSourceBanner.vue'
 import ExplorerToolbar from '~/components/explorer/ExplorerToolbar.vue'
 import IncidentDetailModal from '~/components/incidents/IncidentDetailModal.vue'
+import { useIncidentAnalytics } from '~/composables/useIncidentAnalytics'
+import AnalyticsPanel from '~/components/analytics/AnalyticsPanel.vue'
 
 const {
   incidents,
@@ -33,33 +35,45 @@ const {
   clearSelectedIncident,
 } = useIncidentExplorer(incidents)
 
-function formatDate(date: string | null) {
-  if (!date) return 'Unknown date'
+const {
+  topClickedIncidents,
+  trackIncidentClick,
+  resetAnalytics,
+} = useIncidentAnalytics(incidents)
 
-  return new Intl.DateTimeFormat('en-GB', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(new Date(date))
+
+function handleIncidentSelect(incidentId: string) {
+  trackIncidentClick(incidentId)
+  selectIncident(incidentId)
 }
 
-function formatCoordinates(coordinates: number[] | number[][] | undefined) {
-  if (!coordinates) return 'Unknown coordinates'
+watch(isUsingMock, () => {
+  resetAnalytics()
+})
 
-  if (
-    Array.isArray(coordinates) &&
-    coordinates.length === 2 &&
-    typeof coordinates[0] === 'number' &&
-    typeof coordinates[1] === 'number'
-  ) {
-    const [lng, lat] = coordinates
-    return `${lat}, ${lng}`
+watch(isError, (value) => {
+  if (value) {
+    resetAnalytics()
   }
+})
 
-  if (Array.isArray(coordinates)) {
-    return `${coordinates.length} coordinate sets`
-  }
+async function handleRetryLiveData() {
+  resetAnalytics()
+  await retryLiveData()
+}
 
-  return 'Unknown coordinates'
+function handleUseMockData() {
+  resetAnalytics()
+  useMockData()
+}
+
+async function handleCheckLiveAvailability() {
+  await checkLiveAvailability()
+}
+
+async function handleSwitchToLiveData() {
+  resetAnalytics()
+  await switchToLiveData()
 }
 </script>
 
@@ -73,8 +87,8 @@ function formatCoordinates(coordinates: number[] | number[][] | undefined) {
         </p>
       </header>
 
-      <DataSourceBanner :is-using-mock="isUsingMock" :live-available="liveAvailable" @check-live="checkLiveAvailability"
-        @switch-live="switchToLiveData" />
+      <DataSourceBanner :is-using-mock="isUsingMock" :live-available="liveAvailable"
+        @check-live="handleCheckLiveAvailability" @switch-live="handleSwitchToLiveData" />
 
       <ExplorerToolbar :current-view="currentView" :selected-category="selectedCategory" :sort-order="sortOrder"
         :category-options="categoryOptions" :total="sortedIncidents.length" @update-view="currentView = $event"
@@ -93,11 +107,11 @@ function formatCoordinates(coordinates: number[] | number[][] | undefined) {
 
         <div class="mt-4 flex flex-wrap gap-3">
           <button type="button" class="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white"
-            @click="retryLiveData">
+            @click="handleRetryLiveData">
             Retry
           </button>
 
-          <button type="button" class="rounded-md border border-slate-300 px-4 py-2 text-sm" @click="useMockData">
+          <button type="button" class="rounded-md border border-slate-300 px-4 py-2 text-sm" @click="handleUseMockData">
             Use demo data
           </button>
         </div>
@@ -107,11 +121,14 @@ function formatCoordinates(coordinates: number[] | number[][] | undefined) {
         <p class="text-sm text-slate-600">No incidents found.</p>
       </section>
 
-      <IncidentList v-else-if="currentView === 'list'" :incidents="sortedIncidents" @select="selectIncident" />
+      <IncidentList v-else-if="currentView === 'list'" :incidents="sortedIncidents" @select="handleIncidentSelect" />
 
       <section v-else class="rounded-lg border bg-white p-4 shadow-sm">
-        <IncidentMap :incidents="sortedIncidents" :selected-incident-id="selectedIncidentId" @select="selectIncident" />
+        <IncidentMap :incidents="sortedIncidents" :selected-incident-id="selectedIncidentId"
+          @select="handleIncidentSelect" />
       </section>
+
+      <AnalyticsPanel v-if="incidents.length" :items="topClickedIncidents" @reset="resetAnalytics" />
 
       <IncidentDetailModal :incident="selectedIncident" @close="clearSelectedIncident" />
     </div>
