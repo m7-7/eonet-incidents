@@ -40,36 +40,52 @@ onMounted(() => {
             @click="onBackdropClick">
             <div class="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white shadow-xl" role="dialog"
                 aria-modal="true" aria-labelledby="analytics-modal-title">
-                <div class="flex items-start justify-between gap-4 border-b p-6">
-                    <div>
-                        <h2 id="analytics-modal-title" class="text-xl font-bold">
-                            Most clicked incidents
-                        </h2>
-                        <p class="mt-1 text-sm text-slate-600">
-                            Top 5 incidents based on clicks from the map and list views.
-                        </p>
+                <div class="border-b p-5 sm:p-6">
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="min-w-0">
+                            <h2 id="analytics-modal-title" class="text-xl font-bold">
+                                Most clicked incidents
+                            </h2>
+                            <p class="mt-1 text-sm text-slate-600">
+                                Top 5 incidents based on clicks from the map and list views.
+                            </p>
+                        </div>
+
+                        <!-- Desktop / tablet actions -->
+                        <div class="hidden sm:flex items-center gap-3">
+                            <button type="button" class="rounded-md border border-slate-300 px-4 py-2 text-sm"
+                                @click="$emit('reset')">
+                                Reset analytics
+                            </button>
+
+                            <button type="button" class="rounded-md border border-slate-300 px-3 py-2 text-sm"
+                                @click="$emit('close')">
+                                Close
+                            </button>
+                        </div>
+
+                        <!-- Mobile close button -->
+                        <button type="button" class="rounded-md border border-slate-300 px-3 py-2 text-sm sm:hidden"
+                            @click="$emit('close')">
+                            Close
+                        </button>
                     </div>
 
-                    <button type="button" class="rounded-md border border-slate-300 px-3 py-2 text-sm"
-                        @click="$emit('close')">
-                        Close
-                    </button>
-                </div>
-
-                <div class="p-5 sm:p-6">
-                    <div class="mb-4 flex justify-end">
-                        <button type="button" class="rounded-md border border-slate-300 px-4 py-2 text-sm"
+                    <!-- Mobile reset button -->
+                    <div class="mt-4 sm:hidden">
+                        <button type="button" class="w-full rounded-md border border-slate-300 px-4 py-2 text-sm"
                             @click="$emit('reset')">
                             Reset analytics
                         </button>
                     </div>
+                </div>
 
+                <div class="p-5 sm:p-6">
                     <div v-if="items.length" class="space-y-3">
                         <div v-for="item in items" :key="item.incidentId"
                             class="flex items-start justify-between gap-4 rounded-md border border-slate-200 p-3">
-                            <!-- Left content -->
                             <div class="min-w-0">
-                                <p class="font-medium text-slate-900 leading-snug">
+                                <p class="leading-snug font-medium text-slate-900">
                                     {{ item.title }}
                                 </p>
 
@@ -78,7 +94,6 @@ onMounted(() => {
                                 </p>
                             </div>
 
-                            <!-- Right content -->
                             <div class="shrink-0 text-right">
                                 <p class="text-sm font-semibold text-slate-800">
                                     {{ item.count }}
