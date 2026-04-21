@@ -115,12 +115,6 @@ function handleSelect(incidentId: string) {
     emit('select', incidentId)
 }
 
-watchEffect(() => {
-    console.log('MAP INCIDENTS:', props.incidents.length)
-    console.log('POINT FEATURES:', pointFeatures.value.length)
-    console.log('LINE FEATURES:', lineFeatures.value.length)
-})
-
 </script>
 
 
