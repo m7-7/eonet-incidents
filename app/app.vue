@@ -2,6 +2,7 @@
 import { useEonetEvents } from '~/composables/useEonetEvents'
 import { useIncidentExplorer } from '~/composables/useIncidentExplorer'
 import IncidentMap from '~/components/incidents/IncidentMap.vue'
+import IncidentList from '~/components/incidents/IncidentList.vue'
 import DataSourceBanner from '~/components/explorer/DataSourceBanner.vue'
 import ExplorerToolbar from '~/components/explorer/ExplorerToolbar.vue'
 import IncidentDetailModal from '~/components/incidents/IncidentDetailModal.vue'
@@ -106,32 +107,7 @@ function formatCoordinates(coordinates: number[] | number[][] | undefined) {
         <p class="text-sm text-slate-600">No incidents found.</p>
       </section>
 
-      <section v-else-if="currentView === 'list'" class="rounded-lg border bg-white shadow-sm">
-        <ul class="divide-y">
-          <li v-for="incident in sortedIncidents" :key="incident.id">
-            <button type="button" class="w-full p-4 text-left transition hover:bg-slate-50"
-              @click="selectIncident(incident.id)">
-              <h2 class="text-base font-semibold">
-                {{ incident.title }}
-              </h2>
-
-              <p class="mt-1 text-sm text-slate-600">
-                Categories:
-                {{ incident.categories.length ? incident.categories.join(', ') : 'Unknown' }}
-              </p>
-
-              <p class="mt-1 text-sm text-slate-600">
-                Most recent:
-                {{ formatDate(incident.mostRecentDate) }}
-              </p>
-
-              <p class="mt-1 text-sm text-slate-500">
-                Geometry points: {{ incident.geometry.length }}
-              </p>
-            </button>
-          </li>
-        </ul>
-      </section>
+      <IncidentList v-else-if="currentView === 'list'" :incidents="sortedIncidents" @select="selectIncident" />
 
       <section v-else class="rounded-lg border bg-white p-4 shadow-sm">
         <IncidentMap :incidents="sortedIncidents" :selected-incident-id="selectedIncidentId" @select="selectIncident" />
