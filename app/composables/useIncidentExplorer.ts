@@ -5,7 +5,7 @@ export type IncidentSortOrder = "recent" | "oldest";
 export type IncidentViewMode = "map" | "list";
 
 export function useIncidentExplorer(allIncidents: Ref<Incident[]>) {
-  const currentView = ref<IncidentViewMode>("list");
+  const currentView = ref<IncidentViewMode>("map");
   const selectedCategory = ref<string>("all");
   const sortOrder = ref<IncidentSortOrder>("recent");
   const selectedIncidentId = ref<string | null>(null);

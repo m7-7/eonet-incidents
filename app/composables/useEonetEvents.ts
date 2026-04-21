@@ -5,6 +5,24 @@ import type {
   Incident,
 } from "../../shared/types/incidents";
 
+type EonetApiMessage = {
+  message?: string;
+  retry_after?: number;
+};
+
+function isEonetEventsResponse(value: unknown): value is EonetEventsResponse {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "events" in value &&
+    Array.isArray((value as { events?: unknown }).events)
+  );
+}
+
+function isEonetApiMessage(value: unknown): value is EonetApiMessage {
+  return typeof value === "object" && value !== null && "message" in value;
+}
+
 function getMostRecentDate(geometry: EonetEvent["geometry"]): string | null {
   if (!geometry?.length) return null;
 
@@ -30,30 +48,24 @@ function normalizeEvent(event: EonetEvent, index: number): Incident {
   };
 }
 
-function normalizeEvents(
-  response: EonetEventsResponse | null | undefined,
-): Incident[] {
-  const events = response?.events ?? [];
-  return events.map(normalizeEvent);
+function normalizeEvents(response?: EonetEventsResponse | null): Incident[] {
+  if (!response || !Array.isArray(response.events)) return [];
+  return response.events.map((event, index) => normalizeEvent(event, index));
 }
 
 export function useEonetEvents() {
   const isUsingMock = ref(false);
   const liveAvailable = ref(false);
 
-  const { data, status, error, refresh, execute } =
-    useFetch<EonetEventsResponse>(
-      "https://eonet.gsfc.nasa.gov/api/v3/events?limit=100&status=all",
-      {
-        key: "eonet-events",
-        server: false,
-        immediate: true,
-        default: () => undefined,
-      },
-    );
+  const liveResponse = ref<EonetEventsResponse | null>(null);
+  const liveApiMessage = ref<EonetApiMessage | null>(null);
+  const liveErrorMessage = ref("");
+
+  const isLoading = ref(false);
+  const hasLoadedLive = ref(false);
 
   const liveIncidents = computed<Incident[]>(() => {
-    return normalizeEvents(data.value);
+    return normalizeEvents(liveResponse.value);
   });
 
   const incidents = computed<Incident[]>(() => {
@@ -64,80 +76,125 @@ export function useEonetEvents() {
     return liveIncidents.value;
   });
 
-  const isLoading = computed(
-    () => !isUsingMock.value && status.value === "pending",
-  );
   const isError = computed(() => {
     return (
-      !isUsingMock.value && (status.value === "error" || hasApiMessage.value)
+      !isUsingMock.value &&
+      !isLoading.value &&
+      hasLoadedLive.value &&
+      (!!liveApiMessage.value?.message || !!liveErrorMessage.value)
     );
   });
+
   const isEmpty = computed(() => {
     return (
       !isUsingMock.value &&
-      status.value === "success" &&
+      !isLoading.value &&
+      hasLoadedLive.value &&
+      !isError.value &&
       incidents.value.length === 0
     );
   });
+
   const errorMessage = computed(() => {
-    const raw = data.value as { message?: string } | undefined;
-
-    if (raw?.message) {
-      return raw.message;
+    if (liveApiMessage.value?.message) {
+      return liveApiMessage.value.message;
     }
 
-    if (!error.value) return "Could not load incidents.";
-
-    const message = error.value.message || "Could not load incidents.";
-
-    if (message.toLowerCase().includes("503")) {
-      return "NASA EONET is temporarily unavailable due to high demand. Please try again.";
+    if (liveErrorMessage.value) {
+      return liveErrorMessage.value;
     }
 
-    return message;
+    return "Could not load incidents.";
   });
+
+  async function fetchLiveData() {
+    isLoading.value = true;
+    liveErrorMessage.value = "";
+    liveApiMessage.value = null;
+    liveAvailable.value = false;
+    liveResponse.value = null;
+
+    try {
+      const response = await fetch(
+        "https://eonet.gsfc.nasa.gov/api/v3/events?limit=100&status=all",
+      );
+
+      const json = await response.json();
+
+      console.log("RAW RESPONSE:", json);
+      console.log("RESPONSE OK:", response.ok);
+      console.log("HAS EVENTS ARRAY:", Array.isArray(json?.events));
+      console.log(
+        "EVENTS LENGTH:",
+        Array.isArray(json?.events) ? json.events.length : "no events",
+      );
+
+      hasLoadedLive.value = true;
+
+      if (!response.ok) {
+        if (isEonetApiMessage(json)) {
+          liveApiMessage.value = json;
+        } else {
+          liveErrorMessage.value = "Could not load incidents.";
+        }
+        return;
+      }
+
+      if (!isEonetEventsResponse(json)) {
+        liveErrorMessage.value =
+          "Live API returned an unexpected response shape.";
+        return;
+      }
+
+      liveResponse.value = json;
+      liveAvailable.value = (json.events ?? []).length > 0;
+    } catch (err) {
+      hasLoadedLive.value = true;
+      liveResponse.value = null;
+
+      const message =
+        err instanceof Error ? err.message : "Could not load incidents.";
+
+      if (message.toLowerCase().includes("503")) {
+        liveErrorMessage.value =
+          "NASA EONET is temporarily unavailable due to high demand. Please try again.";
+      } else {
+        liveErrorMessage.value = message;
+      }
+    } finally {
+      isLoading.value = false;
+    }
+  }
 
   async function retryLiveData() {
     isUsingMock.value = false;
-    liveAvailable.value = false;
-    await refresh();
+    await fetchLiveData();
   }
-
-  const hasApiMessage = computed(() => {
-    const raw = data.value as { message?: string } | undefined;
-    return Boolean(raw?.message);
-  });
 
   function useMockData() {
     isUsingMock.value = true;
   }
 
   async function checkLiveAvailability() {
-    try {
-      await execute();
-
-      if (status.value === "success" && liveIncidents.value.length > 0) {
-        liveAvailable.value = true;
-      }
-    } catch {
-      liveAvailable.value = false;
-    }
+    await fetchLiveData();
   }
 
   async function switchToLiveData() {
     isUsingMock.value = false;
-    liveAvailable.value = false;
-    await refresh();
+    await fetchLiveData();
   }
 
   watchEffect(() => {
-    if (
-      !isUsingMock.value &&
-      status.value === "success" &&
-      liveIncidents.value.length > 0
-    ) {
-      liveAvailable.value = true;
-    }
+    console.log("LIVE RESPONSE REF:", liveResponse.value);
+    console.log("LIVE INCIDENTS:", liveIncidents.value.length);
+    console.log("INCIDENTS:", incidents.value.length);
+    console.log("IS ERROR:", isError.value);
+    console.log("IS EMPTY:", isEmpty.value);
+    console.log("IS USING MOCK:", isUsingMock.value);
+  });
+
+  onMounted(async () => {
+    await fetchLiveData();
   });
 
   return {
