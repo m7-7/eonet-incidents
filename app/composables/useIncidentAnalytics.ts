@@ -1,5 +1,5 @@
 import type { ComputedRef } from "vue";
-import type { Incident } from "../../shared/types/incidents";
+import type { Incident } from "../../types/incidents";
 
 type ClickCounts = Record<string, number>;
 

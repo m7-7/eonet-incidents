@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Incident } from '../../../shared/types/incidents'
+import type { Incident } from '../../../types/incidents'
 
 const props = defineProps<{
     incidents: Incident[]

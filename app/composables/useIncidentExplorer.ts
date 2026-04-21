@@ -1,5 +1,5 @@
 import type { Ref } from "vue";
-import type { Incident } from "../../shared/types/incidents";
+import type { Incident } from "../../types/incidents";
 
 export type IncidentSortOrder = "recent" | "oldest";
 export type IncidentViewMode = "map" | "list";

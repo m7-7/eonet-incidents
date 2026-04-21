@@ -3,7 +3,7 @@ import type {
   EonetEvent,
   EonetEventsResponse,
   Incident,
-} from "../../shared/types/incidents";
+} from "../../types/incidents";
 
 type EonetApiMessage = {
   message?: string;
